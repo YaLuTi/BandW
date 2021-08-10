@@ -21,7 +21,6 @@ public class Basic_Bullet : NetworkBehaviour
         transform.position += speed * transform.up * Time.deltaTime;
     }
 
-    [Server]
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.tag == "Player") 

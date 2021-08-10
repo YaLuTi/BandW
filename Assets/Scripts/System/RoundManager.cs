@@ -20,17 +20,19 @@ public class RoundManager : NetworkBehaviour
 
     }
 
-    [Server]
+    [ClientRpc]
     public void CheckRoundEnd()
     {
+        Debug.Log("?");
         for(int i = 0; i < Players.Count; i++)
         {
-
+            Players[i].GetComponent<PlayerMove>().SetToPoint(SpawnPosition[i].position);
         }
     }
     [Server]
     public void AddPlayer(GameObject player)
     {
+        Debug.Log("?");
         Players.Add(player);
         player.GetComponent<PlayerHP>().PlayerDeath += CheckRoundEnd;
     }

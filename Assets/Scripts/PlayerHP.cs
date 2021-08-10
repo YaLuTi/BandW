@@ -43,7 +43,7 @@ public class PlayerHP : NetworkBehaviour
 
     public void Damaged(int damage)
     {
-        CmdDamaged(damage);
+        ServerDamaged(damage);
         audioSource.PlayOneShot(DamageSFX);
         if (isLocalPlayer)
         {
@@ -51,12 +51,12 @@ public class PlayerHP : NetworkBehaviour
         }
     }
 
-    [Command]
-    void CmdDamaged(int damage)
+    [Server]
+    void ServerDamaged(int damage)
     {
         Hp -= damage;
         PlayerHealthChanged?.Invoke(Hp);
-        if(Hp <= 0)
+        if (Hp <= 0)
         {
             PlayerDeath?.Invoke();
         }

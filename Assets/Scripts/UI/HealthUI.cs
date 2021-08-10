@@ -23,6 +23,7 @@ public class HealthUI : NetworkBehaviour
     [ClientRpc]
     private void Change(int hp)
     {
+        Debug.Log("???");
         slider.value = hp;
     }
 }

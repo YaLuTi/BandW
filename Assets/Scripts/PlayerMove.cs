@@ -67,4 +67,10 @@ public class PlayerMove : NetworkBehaviour
         h = value.Get<Vector2>().x;
         v = value.Get<Vector2>().y;
     }
+
+    public void SetToPoint(Vector3 point)
+    {
+        if (!isLocalPlayer) return;
+        transform.position = point;
+    }
 }
