@@ -17,6 +17,7 @@ public class PlayerMove : NetworkBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        DontDestroyOnLoad(this.gameObject);
         if (!isLocalPlayer) return;
         MaxSpeed = (10f / 2) * 1.414f;
         rb = GetComponent<Rigidbody2D>();
@@ -68,9 +69,10 @@ public class PlayerMove : NetworkBehaviour
         v = value.Get<Vector2>().y;
     }
 
-    public void SetToPoint(Vector3 point)
+    public void CmdSetToPoint(Vector3 point)
     {
-        if (!isLocalPlayer) return;
+        Debug.Log(transform.position);
         transform.position = point;
+        Debug.Log(transform.position);
     }
 }
