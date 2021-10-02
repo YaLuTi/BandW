@@ -12,10 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b0738c24674bac2488ba61c200030911, type: 3}
   m_Name: Big
   m_EditorClassIdentifier: 
-  Skillname: Big
+  Skillname: Big2
   SkillIntro: BULLET SIZE +20%
   Skillsprite: {fileID: 7119002349883303594, guid: a64784d5cee58124883ef63e5b2fc404,
     type: 3}
   SkillID: 0
   Command:
-  - playerAttack_add_bulletSize_20
+  - weapon_add_ProjectileSize_1
+  - weapon_add_ProjectileSpeed_-0.3

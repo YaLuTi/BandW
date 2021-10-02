@@ -16,6 +16,14 @@ public class PlayerHP : NetworkBehaviour
 
     AudioSource audioSource;
 
+    float recoveryTimer;
+    [SerializeField]
+    float recoveryTime;
+
+    float recoveryTimer2;
+    [SerializeField]
+    float recoveryTime2;
+
     public delegate void PlayerHealthHandler(int HP);
     public event PlayerHealthHandler PlayerHealthChanged;
 
@@ -31,7 +39,28 @@ public class PlayerHP : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if(isLocalPlayer)
+        {
+            if (Hp < 3)
+            {
+                recoveryTimer += Time.deltaTime;
+                if (recoveryTimer > recoveryTime)
+                {
+                    recoveryTimer2 += Time.deltaTime;
+                    if (recoveryTimer2 > recoveryTime2)
+                    {
+                        recoveryTimer2 = 0;
+                        Heal (1);
+                    }
+                }
+            }
+        }
+    }
+
+    private void ResetRecoveryTimer()
+    {
+        recoveryTimer = 0;
+        recoveryTimer2 = 0;
     }
 
     public override void OnStartServer()
@@ -43,6 +72,7 @@ public class PlayerHP : NetworkBehaviour
 
     public void Damaged(int damage)
     {
+        ResetRecoveryTimer();
         ServerDamaged(damage);
         audioSource.PlayOneShot(DamageSFX);
         if (isLocalPlayer)
@@ -50,7 +80,6 @@ public class PlayerHP : NetworkBehaviour
             CameraFollow.CameraShake();
         }
     }
-
     [Server]
     void ServerDamaged(int damage)
     {
@@ -60,6 +89,34 @@ public class PlayerHP : NetworkBehaviour
         {
             PlayerDeath?.Invoke();
         }
+    }
+
+    public bool Spend(int cost)
+    {
+        if (Hp > cost)
+        {
+            ResetRecoveryTimer();
+            Hp -= cost;
+            PlayerHealthChanged?.Invoke(Hp);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public void Heal(int h)
+    {
+        CmdHeal(h);
+    }
+
+    [Command]
+    public void CmdHeal(int h)
+    {
+        Hp += h;
+        Hp = Mathf.Min(Hp, 5);
+        PlayerHealthChanged?.Invoke(Hp);
     }
 
     [ClientRpc]
@@ -73,5 +130,12 @@ public class PlayerHP : NetworkBehaviour
         base.OnStartClient();
         Debug.Log("Re");
         HpSlider.value = Hp;
+    }
+
+    [Command]
+    public void SetRound()
+    {
+        Hp = 5;
+        PlayerHealthChanged?.Invoke(Hp);
     }
 }

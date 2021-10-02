@@ -19,6 +19,7 @@ public class ReadyButton : NetworkBehaviour
     
     public void Ready()
     {
+        Debug.Log("WTF");
         NetworkClient.localPlayer.GetComponent<PlayerData>().CmdReady();
     }
 }

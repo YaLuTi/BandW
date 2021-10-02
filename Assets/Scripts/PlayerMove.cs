@@ -3,15 +3,20 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 using UnityEngine.InputSystem;
+using System.Reflection;
 
 public class PlayerMove : NetworkBehaviour
 {
-    float a = 0.5f;
+    [SerializeField]
+    public float a = 0.5f;
     public Vector2 speed;
     float MaxSpeed;
     public float MaxSpeedMultiplier = 1;
 
-    Rigidbody2D rb;
+    [SyncVar]
+    public float speedMultiplier = 1;
+
+    public Rigidbody2D rb;
 
     public float h, v;
     // Start is called before the first frame update
@@ -19,7 +24,7 @@ public class PlayerMove : NetworkBehaviour
     {
         DontDestroyOnLoad(this.gameObject);
         if (!isLocalPlayer) return;
-        MaxSpeed = (10f / 2) * 1.414f;
+        MaxSpeed = (8f / 2) * 1.414f;
         rb = GetComponent<Rigidbody2D>();
     }
 
@@ -37,7 +42,7 @@ public class PlayerMove : NetworkBehaviour
 
         // Vector2.Min(speed, new Vector2(2.5f, 2.5f));
 
-        speed *= 0.9f;
+        speed *= 0.95f;
 
         RaycastHit raycastHit;
         Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
@@ -54,7 +59,7 @@ public class PlayerMove : NetworkBehaviour
 
     void Move(Vector2 s)
     {
-        rb.velocity = (new Vector3(s.x, s.y, 0) * 2);
+        rb.velocity = (new Vector3(s.x, s.y, 0) * 2 * speedMultiplier);
     }
 
     void Rotate(float r)
@@ -74,5 +79,28 @@ public class PlayerMove : NetworkBehaviour
         Debug.Log(transform.position);
         transform.position = point;
         Debug.Log(transform.position);
+    }
+
+    public void SetValue(string[] command)
+    {
+        switch (command[1])
+        {
+            case "add":
+                {
+                    FieldInfo field = this.GetType().GetField(command[2]);
+
+                    if (field != null)
+                    {
+                        Debug.Log("1");
+                        field.SetValue(
+                            this, // So we specify who owns the object
+                            (float)field.GetValue(this) + float.Parse(command[3])
+                          );
+                    }
+                }
+                break;
+            default:
+                break;
+        }
     }
 }

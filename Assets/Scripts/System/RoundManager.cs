@@ -6,19 +6,24 @@ using UnityEngine.SceneManagement;
 
 public class RoundManager : NetworkBehaviour
 {
-    static List<GameObject> Players = new List<GameObject>();
+    List<GameObject> Players = new List<GameObject>();
     [SerializeField]
-    Transform[] SpawnPosition;
+    GameObject[] SpawnPosition;
 
     [SyncVar]
     int Num;
 
     [SyncVar]
     public int Ready = 0;
+
+    [SerializeField]
+    NewNetworkManager networkManager;
     // Start is called before the first frame update
     void Start()
     {
         DontDestroyOnLoad(this.gameObject);
+        networkManager = GameObject.FindGameObjectWithTag("GameController").GetComponent<NewNetworkManager>();
+        networkManager.PlayerJoin += AddPlayer;
     }
 
     // Update is called once per frame
@@ -30,24 +35,24 @@ public class RoundManager : NetworkBehaviour
     [Server]
     void ReadyCheck(bool IsReady)
     {
-        int c = 0;
-        for(int i = 0; i < Players.Count; i++)
+        Ready++;
+        if (Ready >= Players.Count)
         {
-            if (Players[i].GetComponent<PlayerData>().IsReady) c++;
-        }
-        Debug.Log(c);
-        Debug.Log(Players.Count);
-        if (c >= Players.Count)
-        {
-            LoadScene();
+            LoadScene("SampleScene");
+            Ready = 0;
         }
     }
 
     [ClientRpc]
     public void CheckRoundEnd()
     {
-        SceneManager.LoadScene(1);
-        NetworkClient.localPlayer.GetComponent<PlayerMove>().CmdSetToPoint(SpawnPosition[NetworkClient.localPlayer.GetComponent<PlayerData>().ID].position);
+        Debug.Log("QWFR");
+        networkManager.ServerChangeScene("SkillScene");
+        foreach(GameObject p in Players)
+        {
+            p.GetComponent<PlayerHP>().SetRound();
+        }
+        // NetworkClient.localPlayer.GetComponent<PlayerMove>().CmdSetToPoint(SpawnPosition[NetworkClient.localPlayer.GetComponent<PlayerData>().ID].position);
     }
     [Server]
     public void AddPlayer(GameObject player)
@@ -62,9 +67,32 @@ public class RoundManager : NetworkBehaviour
     }
 
     [ClientRpc]
-    void LoadScene()
+    public void LoadScene(string scene)
     {
-        SceneManager.LoadScene(0);
+        StartCoroutine(RondStart(scene));
+        
+    }
+
+    IEnumerator RondStart(string scene)
+    {
+        AsyncOperation asyncLoad = networkManager.ServerChangeScene(scene);
+
+        // Wait until the asynchronous scene fully loads
+        while (!asyncLoad.isDone)
+        {
+            yield return null;
+        }
+        if(scene != "SkillScene")
+        {
+            yield return new WaitForSeconds(0.5f);
+            SpawnPosition = GameObject.FindGameObjectsWithTag("Respawn");
+            for(int i = 0; i < Players.Count; i++)
+            {
+                Players[i].GetComponent<PlayerMove>().CmdSetToPoint(SpawnPosition[i].transform.position);
+                Players[i].GetComponent<PlayerHP>().SetRound();
+            }
+        }
+        yield return null;
     }
 
     IEnumerator RoundEnd()

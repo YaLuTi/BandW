@@ -18,10 +18,13 @@ public class PlayerData : NetworkBehaviour
 
     [SerializeField]
     PlayerAttack playerAttack;
+    [SerializeField]
+    PlayerMove playerMove;
+    [SerializeField]
+    Basic_Weapon weapon;
     // Start is called before the first frame update
     void Start()
     {
-        
     }
 
     // Update is called once per frame
@@ -33,12 +36,18 @@ public class PlayerData : NetworkBehaviour
     [Command]
     public void CmdReady()
     {
-        IsReady = !IsReady;
+        IsReady = true;
         PlayerReadyChanged?.Invoke(IsReady);
     }
 
     [Command]
     public void SetSkill(string[] command)
+    {
+        RpcSetSkill(command);
+    }
+
+    [ClientRpc]
+    public void RpcSetSkill(string[] command)
     {
         for (int i = 0; i < command.Length; i++)
         {
@@ -46,12 +55,22 @@ public class PlayerData : NetworkBehaviour
             switch (split[0])
             {
                 case "playerAttack":
-                    playerAttack.CmdSetValue(split);
+                    playerAttack.SetValue(split);
+                    break;
+                case "playerMove":
+                    playerMove.SetValue(split);
+                    break;
+                case "weapon":
+                    weapon.SetValue(split);
+                    break;
+                case "addWeapon":
+                    GameObject instance = Instantiate(Resources.Load(split[1], typeof(GameObject))) as GameObject;
+                    instance.transform.parent = this.transform;
+                    playerAttack.weapon = instance.GetComponent<Basic_Weapon>();
                     break;
                 default:
                     break;
             }
         }
-
     }
 }

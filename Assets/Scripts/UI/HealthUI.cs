@@ -10,8 +10,9 @@ public class HealthUI : NetworkBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        GetComponentInParent<PlayerHP>().PlayerHealthChanged += Change;
+        GetComponent<PlayerHP>().PlayerHealthChanged += Change;
         slider = GetComponentInChildren<Slider>();
+        
     }
 
     // Update is called once per frame
@@ -23,7 +24,6 @@ public class HealthUI : NetworkBehaviour
     [ClientRpc]
     private void Change(int hp)
     {
-        Debug.Log("???");
         slider.value = hp;
     }
 }

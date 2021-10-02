@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 2
   tags:
   - RoundManager
+  - Wall
   layers:
   - Default
   - TransparentFX

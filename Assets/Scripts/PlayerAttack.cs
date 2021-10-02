@@ -8,43 +8,62 @@ using System.Reflection;
 public class PlayerAttack : NetworkBehaviour
 {
     [SerializeField]
-    GameObject bullet;
-    [SerializeField]
     Transform muzzle;
 
+    float attackCooldown;
+    float dashCooldown;
+
     [SerializeField]
-    public float bulletSize = 1;
+    public Basic_Weapon weapon;
+    [SerializeField]
+    public Basic_Weapon dash;
+
+    PlayerHP playerHP;
+
+    [SerializeField]
+    GameObject bullet;
+
+    void Start()
+    {
+        playerHP = GetComponent<PlayerHP>();
+    }
+
+    private void Update()
+    {
+        if(attackCooldown > 0)
+        {
+            attackCooldown -= Time.deltaTime;
+        }
+    }
 
     void OnFire()
     {
-        CmdSpawnBullet();
+        if (weapon == null) return;
+        if (attackCooldown > 0) return;
+        if (!isLocalPlayer) return;
+        CmdFire();
+        attackCooldown = weapon.cooldown;
     }
 
     [Command]
-    void CmdSpawnBullet()
+    void CmdFire()
     {
-        GameObject b = Instantiate(bullet, muzzle.position, muzzle.rotation);
-        b.transform.localScale = new Vector3(bulletSize, bulletSize, bulletSize);
-        NetworkServer.Spawn(b);
-    }
-
-    [Command]
-    public void CmdSetValue(string[] command)
-    {
-        FieldInfo[] rProps = this.GetType().GetFields();
-
-        foreach (FieldInfo rp in rProps)
-            Debug.Log(rp.Name);
-
-        FieldInfo field = this.GetType().GetField(command[2]);
-
-        if (field != null)
+        if (playerHP.Spend(weapon.cost))
         {
-            Debug.Log("1");
-            field.SetValue(
-                this, // So we specify who owns the object
-                10
-              );
+            weapon.Fire(muzzle);
         }
+    }
+
+    void OnDash()
+    {
+        if (dashCooldown > 0) return;
+        if (!isLocalPlayer) return;
+        CmdDash();
+    }
+
+    [Command]
+    void CmdDash()
+    {
+        dash.Fire(muzzle);
     }
 }

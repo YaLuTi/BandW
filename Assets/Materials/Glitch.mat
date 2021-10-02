@@ -9,8 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: Glitch
   m_Shader: {fileID: 4800000, guid: a36b7719ff0465b42ab1407d67672c5f, type: 3}
-  m_ShaderKeywords: ALPHACUTOFF_ON ALPHAROUND_ON DISTORT_ON ETC1_EXTERNAL_ALPHA GLITCH_ON
-    POSTERIZE_ON
+  m_ShaderKeywords: ALPHACUTOFF_ON ALPHAROUND_ON ETC1_EXTERNAL_ALPHA GLITCH_ON POSTERIZE_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -149,7 +148,7 @@ Material:
     - _GhostColorBoost: 1
     - _GhostTransparency: 0
     - _GlitchAmount: 20
-    - _GlitchSize: 0.41
+    - _GlitchSize: 1.22
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1

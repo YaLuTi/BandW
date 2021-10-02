@@ -741,12 +741,12 @@ namespace Mirror
         // can be called from user code to switch scenes again while the game is
         // in progress. This automatically sets clients to be not-ready during
         // the change and ready again to participate in the new scene.
-        public virtual void ServerChangeScene(string newSceneName)
+        public virtual AsyncOperation ServerChangeScene(string newSceneName)
         {
             if (string.IsNullOrEmpty(newSceneName))
             {
                 Debug.LogError("ServerChangeScene empty scene name");
-                return;
+                return null;
             }
 
             // Debug.Log("ServerChangeScene " + newSceneName);
@@ -772,6 +772,7 @@ namespace Mirror
 
             startPositionIndex = 0;
             startPositions.Clear();
+            return loadingSceneAsync;
         }
 
         // This is only set in ClientChangeScene below...never on server.

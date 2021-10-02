@@ -5,7 +5,8 @@ using Mirror;
 
 public class NewNetworkManager : NetworkManager
 {
-    public RoundManager roundManager;
+    public delegate void OnPlayerJoinHandler(GameObject player);
+    public event OnPlayerJoinHandler PlayerJoin;
     public override void OnServerAddPlayer(NetworkConnection conn)
     {
         Transform startPos = GetStartPosition();
@@ -17,6 +18,7 @@ public class NewNetworkManager : NetworkManager
         // => appending the connectionId is WAY more useful for debugging!
         player.name = $"{playerPrefab.name} [connId={conn.connectionId}]";
         NetworkServer.AddPlayerForConnection(conn, player);
-        roundManager.AddPlayer(player);
+        PlayerJoin?.Invoke(player);
+        // roundManager.AddPlayer(player);
     }
 }

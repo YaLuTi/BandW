@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using Mirror.RemoteCalls;
 using UnityEngine;
 
@@ -681,6 +682,27 @@ namespace Mirror
             foreach (SyncObject syncObject in syncObjects)
             {
                 syncObject.Reset();
+            }
+        }
+
+        public virtual void SetValue(string[] command)
+        {
+            switch (command[1])
+            {
+                case "add":
+                    {
+                        FieldInfo field = this.GetType().GetField(command[2]);
+                        if (field != null)
+                        {
+                            field.SetValue(
+                                this, // So we specify who owns the object
+                                (float)field.GetValue(this) + float.Parse(command[3])
+                              );
+                        }
+                    }
+                    break;
+                default:
+                    break;
             }
         }
 

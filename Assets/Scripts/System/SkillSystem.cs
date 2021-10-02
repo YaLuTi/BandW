@@ -8,7 +8,7 @@ public class SkillSystem : NetworkBehaviour
     [SerializeField]
     SkillDataArray dataArray;
     List<SkillData> skillDatas = new List<SkillData>();
-    int[] drawedSkill = new int[3];
+    SkillData[] drawedSkill = new SkillData[3];
     [SerializeField]
     SkillUI[] skillUIs = new SkillUI[3];
     // Start is called before the first frame update
@@ -29,15 +29,15 @@ public class SkillSystem : NetworkBehaviour
         for (int i = 0; i < 3; i++)
         {
             int r = Random.Range(0, skillDatas.Count);
-            drawedSkill[i] = r;
+            drawedSkill[i] = skillDatas[r];
             skillUIs[i].UpdateUI(skillDatas[r]);
             skillDatas.RemoveAt(r);
         }
         skillDatas.Clear();
     }
 
-    public void ChooseSkill()
+    public void ChooseSkill(int i)
     {
-        NetworkClient.localPlayer.GetComponent<PlayerData>().SetSkill(dataArray.skillDatas[0].Command);
+        NetworkClient.localPlayer.GetComponent<PlayerData>().SetSkill(drawedSkill[i].Command);
     }
 }
